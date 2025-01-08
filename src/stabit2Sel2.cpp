@@ -136,6 +136,8 @@ List stabit2Sel2(Rcpp::List Yr, Rcpp::List Xmatchr, Rcpp::List Cr,
   
   arma::mat alphadraws(kX,(niter-(niter % thin))/thin); //floor(niter/thin);
   arma::mat betadraws(kC,(niter-(niter % thin))/thin);
+  bool marketFE = false; // Initialize market fixed effects flag
+  arma::mat gammadraws(1,(niter-(niter % thin))/thin); // Add gammadraws matrix
   arma::mat kappadraws(1,(niter-(niter % thin))/thin);
   arma::mat etadraws(n,(niter-(niter % thin))/thin);
   arma::mat sigmasquarenudraws(1,(niter-(niter % thin))/thin);
@@ -346,24 +348,47 @@ List stabit2Sel2(Rcpp::List Yr, Rcpp::List Xmatchr, Rcpp::List Cr,
   // ---------------------------------------------  
   
   if(binary == TRUE){
-    return List::create(  
-      // parameter draws
-      Named("alphadraws") = alphadraws,
-      Named("betadraws") = betadraws,
-      Named("kappadraws") = kappadraws,
-      Named("etadraws") = etadraws
-    );  
+    if(marketFE) {
+      return List::create(  
+        // parameter draws
+        Named("alphadraws") = alphadraws,
+        Named("betadraws") = betadraws,
+        Named("kappadraws") = kappadraws,
+        Named("gammadraws") = gammadraws,
+        Named("etadraws") = etadraws
+      );
+    } else {
+      return List::create(  
+        // parameter draws
+        Named("alphadraws") = alphadraws,
+        Named("betadraws") = betadraws,
+        Named("kappadraws") = kappadraws,
+        Named("etadraws") = etadraws
+      );  
+    }
   } else if(binary == FALSE){
-    return List::create(  
-      // parameter draws
-      Named("alphadraws") = alphadraws,
-      Named("betadraws") = betadraws,
-      Named("kappadraws") = kappadraws,
-      Named("etadraws") = etadraws,
-      Named("sigmasquarenudraws") = sigmasquarenudraws
-    );
-  } else{
-      return 0;
+    if(marketFE) {
+      return List::create(  
+        // parameter draws
+        Named("alphadraws") = alphadraws,
+        Named("betadraws") = betadraws,
+        Named("kappadraws") = kappadraws,
+        Named("gammadraws") = gammadraws,
+        Named("etadraws") = etadraws,
+        Named("sigmasquarenudraws") = sigmasquarenudraws
+      );
+    } else {
+      return List::create(  
+        // parameter draws
+        Named("alphadraws") = alphadraws,
+        Named("betadraws") = betadraws,
+        Named("kappadraws") = kappadraws,
+        Named("etadraws") = etadraws,
+        Named("sigmasquarenudraws") = sigmasquarenudraws
+      );
+    }
+  } else {
+    return 0;
   }
 }
 
@@ -505,6 +530,3 @@ int change;
    output = sigma*z + mu;
  return (output);
 }
-
-
-
