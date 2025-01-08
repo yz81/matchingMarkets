@@ -640,7 +640,11 @@ stabit2.default <- function(OUT=NULL, SEL=NULL, colleges=NULL, students=NULL, ou
     
   } else if(method=="Klein-selection"){
     
-    est$coefficients <- unlist(with(est, list(c=beta, s=gamma)))
+    if(marketFE) {
+      est$coefficients <- unlist(with(est, list(c=beta, s=gamma, m=delta)))
+    } else {
+      est$coefficients <- unlist(with(est, list(c=beta, s=gamma)))
+    }
     
   }
   
@@ -975,7 +979,4 @@ stabit2_inner <- function(iter, OUT, SEL, SELs, SELc, colleges, students,
     return( list(Y=Xmatch[,1], Xmatch=Xmatch[,-1], C=C, Cmatch=C[D==1,], 
                  D=D, d=d, M=M, H=H, indices=indices$id) )
   }  
-}  
-
-
-
+}
